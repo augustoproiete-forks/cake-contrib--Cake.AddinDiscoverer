@@ -1,4 +1,5 @@
 using Cake.Incubator.StringExtensions;
+using NuGet.Packaging;
 using Octokit;
 using System;
 using System.Diagnostics;
@@ -64,6 +65,10 @@ namespace Cake.AddinDiscoverer.Models
 		public bool XmlDocumentationAvailable { get; set; }
 
 		public MethodInfo[] DecoratedMethods { get; set; }
+
+		public PackageArchiveReader NuGetPackage { get; set; }
+
+		public PackageArchiveReader SymbolsPackage { get; set; }
 
 		public string GetMaintainerName()
 		{
