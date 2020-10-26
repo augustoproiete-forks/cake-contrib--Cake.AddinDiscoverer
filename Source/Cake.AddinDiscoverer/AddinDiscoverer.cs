@@ -43,6 +43,9 @@ namespace Cake.AddinDiscoverer
 			// Analyze the metadata in the downloaded nuget package
 			typeof(AnalyzeNuGetMetadataStep),
 
+			// Analyze the XML documentation
+			typeof(AnalyzeXmlDocumentationStep),
+
 			// Get the owners of the NuGet package
 			typeof(GetPackageOwnershipStep),
 
