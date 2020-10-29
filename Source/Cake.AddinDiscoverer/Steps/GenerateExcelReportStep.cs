@@ -46,11 +46,12 @@ namespace Cake.AddinDiscoverer.Steps
 				// Deprecated report
 				GenerateExcelWorksheetWithNotes(deprecatedAddins, "Deprecated", excel);
 
-				// Save the Excel file
-				excel.Save();
-			}
+				// XML documentation report
+				GenerateExcelWorksheetWithXmlDocumentationNotes(auditedAddins, "XML documentation", excel);
 
-			await Task.Delay(1).ConfigureAwait(false);
+				// Save the Excel file
+				await excel.SaveAsync().ConfigureAwait(false);
+			}
 		}
 
 		private void GenerateExcelWorksheet(IEnumerable<AddinMetadata> addins, CakeVersion cakeVersion, AddinType type, string caption, ExcelPackage excel)
@@ -148,6 +149,43 @@ namespace Cake.AddinDiscoverer.Steps
 			// Resize columns and freeze the top row
 			worksheet.Cells[1, 1, row, 2].AutoFitColumns();
 			worksheet.View.FreezePanes(2, 1);
+		}
+
+		private void GenerateExcelWorksheetWithXmlDocumentationNotes(IEnumerable<AddinMetadata> addins, string caption, ExcelPackage excel)
+		{
+			var worksheet = excel.Workbook.Worksheets.Add(caption);
+
+			worksheet.Cells[1, 1].Value = "Addin";
+			worksheet.Cells[1, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+			worksheet.Cells[1, 2].Value = "Issue";
+			worksheet.Cells[1, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+			var row = 1;
+			foreach (var addin in addins.OrderBy(p => p.Name))
+			{
+				foreach (var note in addin.AnalysisResult.XmlDocumentationAnalysisNotes)
+				{
+					row++;
+					worksheet.Cells[row, 1].Value = addin.Name;
+					worksheet.Cells[row, 2].Value = note ?? string.Empty;
+				}
+			}
+
+			// Freeze the top row and first column
+			worksheet.View.FreezePanes(2, 2);
+
+			// Setup auto-filter
+			worksheet.Cells[1, 1, 1, 2].AutoFilter = true;
+
+			// Resize columns
+			worksheet.Cells[1, 1, row, 2].AutoFitColumns();
+
+			// Make columns a little bit wider to account for the filter "drop-down arrow" button
+			for (int columnIndex = 1; columnIndex <= 2; columnIndex++)
+			{
+				worksheet.Column(columnIndex).Width += 2.14;
+			}
 		}
 	}
 }
